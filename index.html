@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IT Consortium (ITC) | Enterprise Helpdesk Queue System</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- TOP NOC HEADER -->
+  <header>
+    <div class="brand">
+      <div class="brand-badge">ITC // NOC</div>
+      <div class="brand-text">
+        <h1>IT Consortium — Enterprise Helpdesk & Incident Queue</h1>
+        <p>Dynamic Linked-List FIFO Ticket Dispatch System</p>
+      </div>
+    </div>
+
+    <div class="metrics-row">
+      <div class="metric-box">
+        <span>Open Tickets</span>
+        <strong id="metricOpen">0</strong>
+      </div>
+      <div class="metric-box">
+        <span>Est. SLA Backlog</span>
+        <strong id="metricSla">0 mins</strong>
+      </div>
+      <div class="metric-box">
+        <span>Resolved Today</span>
+        <strong id="metricResolved">0</strong>
+      </div>
+      <div class="metric-box">
+        <span>Enqueue / Dequeue</span>
+        <strong>O(1)</strong>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN WORKSPACE -->
+  <div class="workspace">
+
+    <!-- LEFT: LOG NEW SUPPORT TICKET (ENQUEUE) -->
+    <div class="panel">
+      <div class="panel-header">
+        <h2>1. Log Technical Support Ticket</h2>
+        <span class="code-pill">enqueue(Tail)</span>
+      </div>
+
+      <form id="ticketForm" onsubmit="handleLogTicket(event)">
+        <div class="field">
+          <label for="reporterInput">Client Institution or Staff Name</label>
+          <input type="text" id="reporterInput" placeholder="e.g., GCB Mobile Banking / Kwesi (Dev)" required />
+        </div>
+
+        <div class="field">
+          <label for="issueInput">Technical Issue Summary</label>
+          <input type="text" id="issueInput" placeholder="e.g., REST API 504 Gateway Timeout" required />
+        </div>
+
+        <div class="field">
+          <label for="categorySelect">System Domain & Engineering Squad</label>
+          <select id="categorySelect">
+            <option value="1">[API] Payment Gateway & API Squad</option>
+            <option value="2">[DBA] Database & SQL Reliability Unit</option>
+            <option value="3">[NET] NOC Network, VPN & Cloud Security</option>
+            <option value="4">[SYS] Workstation OS & Internal Hardware</option>
+          </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary">
+          + Log Support Ticket (Enqueue at Tail)
+        </button>
+      </form>
+
+      <button type="button" class="btn btn-demo" onclick="loadSampleIncidents()">
+        ⚡ Quick Demo: Auto-Load 3 IT Support Incidents
+      </button>
+
+      <div id="ticketSlip" class="ticket-slip">
+        <div class="ticket-slip-header">
+          <span>NEW INCIDENT LOGGED</span>
+          <span id="slipId">API-101</span>
+        </div>
+        <div class="slip-row"><span>Reporter:</span><strong id="slipReporter">-</strong></div>
+        <div class="slip-row"><span>Issue:</span><strong id="slipIssue">-</strong></div>
+        <div class="slip-row"><span>Squad:</span><strong id="slipSquad">-</strong></div>
+        <div class="slip-row"><span>Queue Pos:</span><strong id="slipPos">-</strong></div>
+        <div class="slip-row"><span>Est. SLA Wait:</span><strong id="slipWait">-</strong></div>
+      </div>
+    </div>
+
+    <!-- RIGHT: ENGINEER DISPATCH, POINTER MEMORY & QUEUE TABLE -->
+    <div class="right-stack">
+
+      <!-- ENGINEER DISPATCH CONSOLE (DEQUEUE & PEEK) -->
+      <div class="panel">
+        <div class="panel-header">
+          <h2>2. Engineer Dispatch Console</h2>
+          <span class="code-pill">dequeue(Head) / peek()</span>
+        </div>
+
+        <div class="dispatch-grid">
+          <div class="action-stack">
+            <button class="btn btn-dispatch" onclick="handleDispatch()">
+              🛠️ Dispatch Next Ticket to Engineer (Dequeue)
+            </button>
+            <button class="btn btn-peek" onclick="handlePeek()">
+              🔍 Peek Oldest Waiting Ticket (Head)
+            </button>
+            <div id="statusLog" class="status-log"></div>
+          </div>
+
+          <div id="dispatchMonitor" class="active-dispatch-monitor">
+            <div class="monitor-label">ACTIVE ENGINEER DISPATCH</div>
+            <div id="monitorTicketId" class="monitor-ticket-id">STANDBY</div>
+            <div id="monitorIssue" class="monitor-issue">All engineering squads awaiting dispatch</div>
+            <div id="monitorSquad" class="monitor-squad">Queue Idle</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- LIVE LINKED-LIST POINTER VISUALIZER -->
+      <div class="panel">
+        <div class="panel-header">
+          <h2>3. Dynamic Linked-List Queue Memory Visualizer</h2>
+          <span class="code-pill">HEAD → IncidentNode* → TAIL → NULL</span>
+        </div>
+        <div id="pointerCanvas" class="pointer-canvas"></div>
+      </div>
+
+      <!-- LIVE HELPDESK BACKLOG TABLE -->
+      <div class="panel">
+        <div class="panel-header">
+          <h2>4. Live NOC Incident Backlog (FIFO Order)</h2>
+          <span class="code-pill">Traversal O(n)</span>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Queue Pos</th>
+                <th>Ticket ID</th>
+                <th>Reporter / Client</th>
+                <th>Technical Issue Summary</th>
+                <th>Assigned Engineering Squad</th>
+                <th>Est. SLA Wait</th>
+              </tr>
+            </thead>
+            <tbody id="backlogTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
